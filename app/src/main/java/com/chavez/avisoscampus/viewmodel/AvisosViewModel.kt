@@ -1,12 +1,8 @@
 package com.chavez.avisoscampus.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.chavez.avisoscampus.data.AvisosRepository
-import com.chavez.avisoscampus.data.AvisosRepositoryMemoria
 import com.chavez.avisoscampus.model.Aviso
 import com.chavez.avisoscampus.model.EventoAviso
 import com.chavez.avisoscampus.model.Origen
@@ -16,14 +12,20 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class AvisosViewModel(private val repo: AvisosRepository) : ViewModel() {
 
-    val avisos: StateFlow<List<Aviso>> = repo.avisos
+    val avisos: StateFlow<List<Aviso>> = repo.avisos.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = emptyList()
+    )
 
     private val _eventos = MutableSharedFlow<EventoAviso>()
     val eventos: SharedFlow<EventoAviso> = _eventos.asSharedFlow()
@@ -95,11 +97,5 @@ class AvisosViewModel(private val repo: AvisosRepository) : ViewModel() {
 
     fun noSePudoMostrar() {
         _mensaje.value = "Sin permiso: el aviso se guardó en el historial, pero no se mostró"
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer { AvisosViewModel(AvisosRepositoryMemoria()) }
-        }
     }
 }

@@ -2,6 +2,7 @@ package com.chavez.avisoscampus.data
 
 import com.chavez.avisoscampus.model.Aviso
 import com.chavez.avisoscampus.model.Origen
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -10,8 +11,8 @@ import java.util.Date
 import java.util.Locale
 
 interface AvisosRepository {
-    val avisos: StateFlow<List<Aviso>>
-    fun registrar(titulo: String, texto: String, origen: Origen): Aviso
+    val avisos: Flow<List<Aviso>>
+    suspend fun registrar(titulo: String, texto: String, origen: Origen): Aviso
 }
 
 class AvisosRepositoryMemoria : AvisosRepository {
@@ -21,7 +22,7 @@ class AvisosRepositoryMemoria : AvisosRepository {
 
     private var siguiente = 1
 
-    override fun registrar(titulo: String, texto: String, origen: Origen): Aviso {
+    override suspend fun registrar(titulo: String, texto: String, origen: Origen): Aviso {
         val hora = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date())
         val aviso = Aviso(siguiente++, titulo, texto, origen, hora)
         _avisos.value = listOf(aviso) + _avisos.value
