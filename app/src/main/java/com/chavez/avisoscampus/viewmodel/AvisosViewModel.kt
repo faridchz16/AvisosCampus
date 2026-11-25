@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.chavez.avisoscampus.data.AvisosRepository
 import com.chavez.avisoscampus.data.AvisosRepositoryMemoria
 import com.chavez.avisoscampus.model.Aviso
+import com.chavez.avisoscampus.model.EventoAviso
 import com.chavez.avisoscampus.model.Origen
 import com.chavez.avisoscampus.model.PermisoUi
 import kotlinx.coroutines.Job
@@ -24,8 +25,8 @@ class AvisosViewModel(private val repo: AvisosRepository) : ViewModel() {
 
     val avisos: StateFlow<List<Aviso>> = repo.avisos
 
-    private val _eventos = MutableSharedFlow<Aviso>()
-    val eventos: SharedFlow<Aviso> = _eventos.asSharedFlow()
+    private val _eventos = MutableSharedFlow<EventoAviso>()
+    val eventos: SharedFlow<EventoAviso> = _eventos.asSharedFlow()
 
     private val _permiso = MutableStateFlow<PermisoUi>(PermisoUi.SinPedir)
     val permiso: StateFlow<PermisoUi> = _permiso.asStateFlow()
@@ -50,7 +51,7 @@ class AvisosViewModel(private val repo: AvisosRepository) : ViewModel() {
     fun avisarAhora() {
         viewModelScope.launch {
             val aviso = repo.registrar("Tarea lista", "Tu entrega fue registrada", Origen.BOTON)
-            _eventos.emit(aviso)
+            _eventos.emit(EventoAviso(aviso, urgente = false))
         }
     }
 
@@ -69,7 +70,7 @@ class AvisosViewModel(private val repo: AvisosRepository) : ViewModel() {
                     "Revisa tu laboratorio pendiente",
                     Origen.RECORDATORIO
                 )
-                _eventos.emit(aviso)
+                _eventos.emit(EventoAviso(aviso, urgente = true))
             } finally {
                 _faltan.value = null
             }
@@ -88,7 +89,7 @@ class AvisosViewModel(private val repo: AvisosRepository) : ViewModel() {
         viewModelScope.launch {
             val texto = if (activo) "Activado" else "Desactivado"
             val aviso = repo.registrar("Modo avión", texto, Origen.MODO_AVION)
-            _eventos.emit(aviso)
+            _eventos.emit(EventoAviso(aviso, urgente = false))
         }
     }
 

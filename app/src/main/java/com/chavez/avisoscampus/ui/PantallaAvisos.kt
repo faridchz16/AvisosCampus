@@ -73,8 +73,8 @@ fun PantallaAvisos(vm: AvisosViewModel) {
     }
 
     LaunchedEffect(Unit) {
-        vm.eventos.collect { aviso ->
-            val mostrado = Notificador.mostrar(contexto, aviso)
+        vm.eventos.collect { evento ->
+            val mostrado = Notificador.mostrar(contexto, evento.aviso, evento.urgente)
             if (!mostrado) {
                 vm.noSePudoMostrar()
             }
