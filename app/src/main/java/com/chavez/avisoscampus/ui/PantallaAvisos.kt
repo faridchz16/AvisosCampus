@@ -58,6 +58,12 @@ fun PantallaAvisos(vm: AvisosViewModel) {
         }
     }
 
+    LaunchedEffect(Unit) {
+        vm.eventos.collect { aviso ->
+            Notificador.mostrar(contexto, aviso)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -96,7 +102,9 @@ fun PantallaAvisos(vm: AvisosViewModel) {
                 }
             }
             TarjetaSeccion("Avisos") {
-                Text("Sin funciones todavía")
+                Button(onClick = { vm.avisarAhora() }) {
+                    Text("Mostrar aviso")
+                }
             }
             TarjetaSeccion("Recordatorio") {
                 Text("Sin funciones todavía")
