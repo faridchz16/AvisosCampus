@@ -66,10 +66,12 @@ object Notificador {
         } else {
             NotificationCompat.PRIORITY_DEFAULT
         }
+        val textoLargo = "${aviso.texto}\nOrigen: ${aviso.origen.texto} · Hora: ${aviso.hora}"
         val notificacion = NotificationCompat.Builder(context, canal)
             .setSmallIcon(R.drawable.ic_notificacion)
             .setContentTitle(aviso.titulo)
             .setContentText(aviso.texto)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(textoLargo))
             .setPriority(prioridad)
             .setContentIntent(pendiente)
             .setAutoCancel(true)
